@@ -25,6 +25,15 @@ vim = "latest"
 vim = { version = "9.2", features = "huge", configure_options = "--with-compiledby=mise --enable-python3interp=dynamic" }
 ```
 
+リリースタグ以外のブランチ・タグ・コミットは `ref:` を付けて指定できます（GitHub のソースアーカイブからビルド）。
+
+```sh
+mise install vim@ref:master
+mise install vim@ref:<commit sha>
+```
+
+`ref:master` は1つのバージョンとして扱われ、master が進んでも自動では更新されません。最新にするには `mise install -f vim@ref:master` で入れ直してください。
+
 | オプション | 既定値 | 内容 | asdf-vim での対応 |
 | --- | --- | --- | --- |
 | `features` | `huge` | `--with-features=`（`tiny` / `normal` / `huge`） | `ASDF_VIM_TYPE` |

@@ -38,6 +38,9 @@ end
 --- Downloads the source tarball to a temporary directory, then
 --- ./configure --prefix=<install dir> && make && make install.
 ---
+--- The version is a release tag without "v" (9.2.1302), or "ref:<git ref>"
+--- (ref:master, ref:<commit sha>) to build any branch, tag or commit.
+---
 --- Tool options (mise.toml), same defaults as asdf-vim:
 ---   features          tiny|normal|huge   (default "huge")      ASDF_VIM_TYPE
 ---   configure_options configure args (default: DEFAULT_CONFIG below)   ASDF_VIM_CONFIG
@@ -66,7 +69,18 @@ function PLUGIN:PostInstall(ctx)
     -- is done explicitly on the download error path and by a shell trap below.
     local work = cmd.exec("mktemp -d"):gsub("%s+$", "")
     local tarball = file.join_path(work, "vim.tar.gz")
-    local url = "https://github.com/vim/vim/archive/refs/tags/v" .. version .. ".tar.gz"
+    local url
+    local ref = version:match("^ref:(.+)$")
+    if ref then
+        -- vim@ref:<branch|tag|commit>: GitHub source archive (includes configure)
+        if not ref:match("^[%w%._/-]+$") then
+            cmd.exec("rm -rf " .. sh_quote(work))
+            error("invalid git ref: " .. ref)
+        end
+        url = "https://github.com/vim/vim/archive/" .. ref .. ".tar.gz"
+    else
+        url = "https://github.com/vim/vim/archive/refs/tags/v" .. version .. ".tar.gz"
+    end
 
     print("Downloading " .. url)
     local dl_err = http.download_file({ url = url }, tarball)
@@ -86,8 +100,9 @@ function PLUGIN:PostInstall(ctx)
         "work=" .. sh_quote(work),
         "trap 'rm -rf \"$work\"' EXIT",
         "cd \"$work\"",
-        "tar -xzf vim.tar.gz",
-        "cd vim-" .. sh_quote(version),
+        -- the top-level directory name depends on the ref, so strip it
+        "mkdir src && tar -xzf vim.tar.gz -C src --strip-components=1",
+        "cd src",
         "./configure " .. args .. " >configure.out 2>&1 || { tail -n 50 configure.out >&2; exit 1; }",
         "make -j " .. jobs .. " >make.out 2>&1 || { tail -n 50 make.out >&2; exit 1; }",
         "make install >install.out 2>&1 || { tail -n 50 install.out >&2; exit 1; }",
