@@ -44,6 +44,18 @@ vim = { version = "9.2", features = "huge", configure_options = "--with-compiled
 
 `CFLAGS` などの環境変数は mise の `install_env` で渡せます。
 
+## リリース日（minimum_release_age）
+
+mise の `minimum_release_age`（既定 24h）のため、直近のタグについては GitHub の tags Atom フィードからリリース日を取得しています。
+取得する範囲は既定で直近3日分です。mise は日付のないバージョンを cutoff で隠さないので、
+`minimum_release_age` を3日より長くしている場合は、同じ長さ以上を環境変数で指定してください。
+
+```sh
+export MISE_VIM_DATE_WINDOW_DAYS=7
+```
+
+範囲を広げるほど、`mise ls-remote vim` が遅くなります（フィード1ページで10タグ、GitHub 側でキャッシュされていないページは1ページ2秒ほどかかります）。
+
 ## 依存パッケージ
 
 C コンパイラ（`cc`）、`make`、`tar`、ncurses の開発パッケージ（pkg-config の `ncursesw`）が必要です。
