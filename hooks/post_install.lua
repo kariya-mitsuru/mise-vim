@@ -44,6 +44,7 @@ end
 --- Tool options (mise.toml), same defaults as asdf-vim:
 ---   features          tiny|normal|huge   (default "huge")      ASDF_VIM_TYPE
 ---   configure_options configure args (default: DEFAULT_CONFIG below)   ASDF_VIM_CONFIG
+---   extra_configure_options  appended after configure_options (or its default)
 ---   gui               --enable-gui=<value>, overrides the one in configure_options
 ---   jobs              make -j value       (default: nproc)
 function PLUGIN:PostInstall(ctx)
@@ -53,6 +54,10 @@ function PLUGIN:PostInstall(ctx)
 
     local features = opt(options, "features") or "huge"
     local config = opt(options, "configure_options") or DEFAULT_CONFIG
+    local extra = opt(options, "extra_configure_options")
+    if extra then
+        config = config .. " " .. extra
+    end
     local gui = opt(options, "gui")
     if gui and not GUI_VALUES[gui] then
         error("unsupported gui value: " .. gui)

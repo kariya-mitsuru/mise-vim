@@ -23,6 +23,9 @@ vim = "latest"
 
 # オプションを指定する場合
 vim = { version = "9.2", features = "huge", configure_options = "--with-compiledby=mise --enable-python3interp=dynamic" }
+
+# 既定値に引数を追加する場合（後に書いた引数が優先されるので --without-x も打ち消せる）
+vim = { version = "latest", extra_configure_options = "--with-x" }
 ```
 
 リリースタグ以外のブランチ・タグ・コミットは `ref:` を付けて指定できます（GitHub のソースアーカイブからビルド）。
@@ -38,6 +41,7 @@ mise install vim@ref:<commit sha>
 | --- | --- | --- | --- |
 | `features` | `huge` | `--with-features=`（`tiny` / `normal` / `huge`） | `ASDF_VIM_TYPE` |
 | `configure_options` | 下記 | configure に渡す引数（指定すると既定値は置き換わる） | `ASDF_VIM_CONFIG` |
+| `extra_configure_options` | なし | `configure_options`（または既定値）の後ろに追加する configure 引数 | なし |
 | `gui` | なし | `--enable-gui=`。`configure_options` 内の指定より優先（`auto` `no` `gtk2` `gnome2` `gtk3` `gtk4` `motif` `haiku` `photon` `carbon`） | `ASDF_VIM_GUI` |
 | `jobs` | `nproc` | `make -j` の並列数 | `ASDF_CONCURRENCY` |
 
